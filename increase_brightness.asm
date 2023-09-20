@@ -1,13 +1,15 @@
 .data
-buffer:         .space  19   # Buffer to store Header content
+buffer:         .space  70000   # Buffer to store Header content
 filename:       .asciiz "C:/Users/Aimee Simons/Desktop/2023/Lectures/Semester 2/CSC2002S/Assignments/Assignment4/CSC2002S_Assignment4/house_64_in_ascii_cr.ppm"
 newline:        .asciiz "\n"
-lineBuffer:     .space 4
 colourHeader:   .asciiz "P3\n# Tre\n64 64\n255"
+newNumber:      .space 10
+IntNum:         .space 10
 .text
 .globl main
 
 main:
+    la $s2, newNumber
     # Open the file for reading
     li      $v0, 13             # Syscall code for open (13)
     la      $a0, filename       # Load the address of the filename
@@ -18,26 +20,43 @@ main:
     bltz    $v0, exit           # If $v0 is negative, there was an error opening the file
 
     move    $a0, $v0 
-
-    li      $v0, 14             # Syscall code for read (14)
-    la      $a1, buffer         # Load the address of the buffer
-    li      $a2, 19            # Read Header of file
+    move $t1, $zero # Sum variable for average 1
+    move $t2, $zero # Sum variable for average 2
+    
+    li $v0, 14
+    la $a1, buffer
+    la $a2, 70000
     syscall
+    lb $t3, 0($a1)
+    beq, $t3, 0, close_file # check if it is an empty file
+    add $a1, $a1, 19 # skip over header lines
+    
+    move $t0, $a1
+    loop_read:
+        lb $t3, 0($t0)
+        ble $t3, 0, close_file    # if reached the end of the file
+        beq $t3, 10, convert   # if an endline character is found
+        sb $t3, 0($s2)   
+        addi $t0, $t0, 1
+        addi $s2, $s2, 1
+        addi $t4, $t4, 1
+        j loop_read
 
-    read_loop:
-        li $v0, 14
-        la $a1, lineBuffer # read numbers 
-        li $a2, 4
-        syscall
-
-        bltz    $v0, close_file # end of file
-
-        li $v0, 4
-        la $a0, lineBuffer
-        syscall
-        j read_loop
+        
 
 
+convert:
+    move $t6, $zero
+    sub $s2, $s2, $t4
+    loopNum:
+        lb $t7, 0($t2)
+        sb $t7, 0($t8)
+
+
+
+    addi $t0, $t0, 1
+    move $t4, $zero    
+    j loop_read
 
 close_file:
     # Close the file
