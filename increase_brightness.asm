@@ -5,9 +5,14 @@ newNumber:      .space 10
 IntNum:         .space 10
 message1:       .asciiz "Average pixel value of the original image:\n"
 message2:       .asciiz "Average pixel value of the new image:\n"
-outputStr:   .space 35
+outputStr:   .space 70
 outputFile:     .asciiz "C:/Users/Aimee Simons/Desktop/2023/Lectures/Semester 2/CSC2002S/Assignments/Assignment4/CSC2002S_Assignment4/output files/increaseBrightness1.ppm"
 colourHeader:   .asciiz "P3\n# Hse\n64 64\n255\n"
+average1:       .asciiz "%.2f\n"
+average2:       .asciiz "%.2f\n"
+denominator:    .double 9.0
+maximum:        .double 255.0
+newline:        .asciiz "\n"
 .text
 .globl main
 
@@ -116,10 +121,6 @@ print:
     sb $t9, 0($s3)                # add a newline character to the end of the string
     addi $s3, $s3, 1
 
-    li $v0, 4
-    la $a0, outputStr 
-    syscall
-
     j loop_read
 
 close_file:
@@ -136,25 +137,49 @@ close_file:
 
     move $a0, $v0
     li $v0, 15
-    la $a1, outputStr
-    li $a2, 31
+    la $a1, outputStr #write output string to file
+    li $a2, 70
     syscall
 
-    li $v0, 16
+    li $v0, 16    # close the file
     move $a0, $v0
     syscall
 
-    mtc1    $t1, $f0        # Convert $t0 to $f0
-    mtc1    $t2, $f1        # Convert $t1 to $f1
+    mtc1    $t1, $f0        # Convert $t1 to $f0
+    cvt.d.w $f0, $f0
+    mtc1    $t2, $f2        # Convert $t2 to $f1
+    cvt.d.w $f2, $f2
 
-    
+    l.d     $f6, denominator
+    div.d   $f0, $f0, $f6  # average 1
+    div.d   $f2, $f2, $f6 # average 2
+
+    l.d     $f8, maximum
+    div.d   $f0, $f0, $f8 # normalized average 1
+    div.d   $f2, $f2, $f8 # normalized average 2
+
+
     li $v0, 4
     la $a0, message1
     syscall
 
 
+    mov.d     $f12, $f0
+    la $a0, average1
+    li $v0, 3
+    syscall
+
+    li $v0, 4
+    la $a0, newline
+    syscall
+    
     li $v0, 4
     la $a0, message2
+    syscall
+
+    mov.d     $f12, $f2
+    la $a0, average2
+    li $v0, 3
     syscall
 
 exit:
