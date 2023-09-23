@@ -1,12 +1,11 @@
 .data
 buffer:         .space  47803   # Buffer to store  
-filename:       .asciiz "C:/Users/Aimee Simons/Desktop/2023/Lectures/Semester 2/CSC2002S/Assignments/Assignment4/CSC2002S_Assignment4/house_64_in_ascii_lf copy.ppm"
+filename:       .asciiz "C:/Users/Aimee Simons/Desktop/2023/Lectures/Semester 2/CSC2002S/Assignments/Assignment4/CSC2002S_Assignment4/sample_images/house_64_in_ascii_lf.ppm"
 newNumber:      .space 10
 IntNum:         .space 10
-outputStr:      .space 47803
-outputFile:     .asciiz "C:/Users/Aimee Simons/Desktop/2023/Lectures/Semester 2/CSC2002S/Assignments/Assignment4/CSC2002S_Assignment4/output files/greyscale1.ppm"
+outputStr:      .space 16014
+outputFile:     .asciiz "C:/Users/Aimee Simons/Desktop/2023/Lectures/Semester 2/CSC2002S/Assignments/Assignment4/CSC2002S_Assignment4/output files/greyscale_House.ppm"
 greyHeader:   .asciiz "P2\n# Hse\n64 64\n255\n"
-average1:       .asciiz "%.2f\n"
 newline:        .asciiz "\n"
 .text
 .globl main
@@ -14,7 +13,7 @@ newline:        .asciiz "\n"
 main:
     la $s2, newNumber
     la $s3, outputStr
-    la $s4, colourHeader
+    la $s4, greyHeader
     move $t1, $zero
     loop1:
         lb $t0, 0($s4)
@@ -87,37 +86,44 @@ convert:
         add $t1, $t1, $t6 # add number to average sum
         addi $t2, $t2, 1
         beq $t2, 3, avg
+        move $t4, $zero 
         j loop_read
         grey:
-            add $s0, $t4, $zero
-            sub $t4, $t4, 1
-            add $s3, $s3, $t4
-            move $t4, $zero 
-            move $t5, $zero
-            convertBack:        # convert back to string to print to textfile 
-                div $t1, $t1, 10
-                mfhi $t7
-                beq $t5, $s0, print # add endline character to string
-                add $t7, $t7, '0'
-                sb $t7, 0($s3)
-                addi $s3, $s3, -1
-                addi $t5, $t5, 1  # counter for loop
-                j convertBack
+            move $s0, $zero
+            move $s7, $t1
+            loopLen:
+                div $s7, $s7, 10
+                addi $s0, $s0, 1
+                beqz $s7, cont
+                j loopLen
+            cont:
+                move $t4, $s0
+                sub $t4, $t4, 1
+                add $s3, $s3, $t4
+                move $t4, $zero 
+                move $t5, $zero
+                convertBack:        # convert back to string to print to textfile 
+                    div $t1, $t1, 10
+                    mfhi $t7
+                    beq $t7, 0, zero # add endline character to string
+                    add $t7, $t7, '0'
+                    sb $t7, 0($s3)
+                    addi $s3, $s3, -1
+                    addi $t5, $t5, 1  # counter for loop
+                    j convertBack
            
 avg:
     div $t1, $t1, $t2
     li $t2, 0
     j grey
 
-lessThan110:
-    addi $t4, $t4, 1
-    add $s0, $t4, $zero
-    sub $t4, $t4, 1
-    add $s3, $s3, $t4
-    move $t4, $zero 
-    move $t5, $zero
+zero:
+    beq $t1, 0, print
+    add $t7, $t7, '0'
+    sb $t7, 0($s3)
+    addi $s3, $s3, -1
+    addi $t5, $t5, 1  # counter for loop
     j convertBack
-
 
 
 print:
@@ -145,7 +151,7 @@ close_file:
     move $a0, $v0
     li $v0, 15
     la $a1, outputStr #write output string to file
-    li $a2, 47803
+    li $a2, 16014
     syscall
 
     li $v0, 16    # close the file
