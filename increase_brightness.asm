@@ -1,16 +1,16 @@
 .data
-buffer:         .space  60000   # Buffer to store  
-filename:       .asciiz "C:/Users/Aimee Simons/Desktop/2023/Lectures/Semester 2/CSC2002S/Assignments/Assignment4/CSC2002S_Assignment4/house_64_in_ascii_lf copy.ppm"
+buffer:         .space  47803   # Buffer to store the file 
+filename:       .asciiz "C:/Users/Aimee Simons/Desktop/2023/Lectures/Semester 2/CSC2002S/Assignments/Assignment4/CSC2002S_Assignment4/sample_images/house_64_in_ascii_lf.ppm"
 newNumber:      .space 10
 IntNum:         .space 10
 message1:       .asciiz "Average pixel value of the original image:\n"
 message2:       .asciiz "Average pixel value of the new image:\n"
-outputStr:   .space 70
-outputFile:     .asciiz "C:/Users/Aimee Simons/Desktop/2023/Lectures/Semester 2/CSC2002S/Assignments/Assignment4/CSC2002S_Assignment4/output files/increaseBrightness1.ppm"
+outputStr:      .space 47803 # buffer to store the output
+outputFile:     .asciiz "C:/Users/Aimee Simons/Desktop/2023/Lectures/Semester 2/CSC2002S/Assignments/Assignment4/CSC2002S_Assignment4/output files/increase_brightness_House.ppm"
 colourHeader:   .asciiz "P3\n# Hse\n64 64\n255\n"
 average1:       .asciiz "%.2f\n"
 average2:       .asciiz "%.2f\n"
-denominator:    .double 9.0
+denominator:    .double 12288.0
 maximum:        .double 255.0
 newline:        .asciiz "\n"
 .text
@@ -51,7 +51,7 @@ main:
     
     li $v0, 14
     la $a1, buffer
-    la $a2, 60000
+    la $a2, 47803
     syscall
 
     lb $t3, 0($a1)
@@ -76,13 +76,15 @@ main:
 convert:
     li $t6, 0
     sub $s2, $s2, $t4
+    move $t8, $zero
     loopNum:
         lb $t7, 0($s2)
-        beq $t7, 0, end_loop
+        beq $t8, $t4, end_loop
         mul $t6, $t6, 10
         sub $t7, $t7, '0'
         add $t6, $t6, $t7
         addi $s2, $s2, 1
+        addi $t8, $t8, 1
         j loopNum
     end_loop:
         addi $t0, $t0, 1
@@ -92,25 +94,43 @@ convert:
         add $t6, $t6, 10 # add 10 for brightness
         bgt $t6, 255, greaterThan255 # if RGB value + 10 is greater than 255
         add $t2, $t2, $t6   # add number to average2 sum
-        add $s0, $t4, $zero
-        sub $t4, $t4, 1
-        add $s3, $s3, $t4
-        move $t4, $zero 
-        move $t5, $zero
-        convertBack:        # convert back to string to print to textfile 
-            div $t6, $t6, 10
-            mfhi $t7
-            beq $t5, $s0, print # add endline character to string
-            add $t7, $t7, '0'
-            sb $t7, 0($s3)
-            addi $s3, $s3, -1
-            addi $t5, $t5, 1  # counter for loop
-            j convertBack
+        bgt $t6, 100, cont
+        blt $t6, 100, cont2
+        cont:
+            blt $t6, 110, lessThan110
+            cont2:
+                add $s0, $t4, $zero
+                sub $t4, $t4, 1
+                add $s3, $s3, $t4
+                move $t4, $zero 
+                move $t5, $zero
+                convertBack:        # convert back to string to print to textfile 
+                    div $t6, $t6, 10
+                    mfhi $t7
+                    beq $t5, $s0, print # add endline character to string
+                    add $t7, $t7, '0'
+                    sb $t7, 0($s3)
+                    addi $s3, $s3, -1
+                    addi $t5, $t5, 1  # counter for loop
+                    j convertBack
            
+lessThan110:
+    addi $t4, $t4, 1
+    add $s0, $t4, $zero
+    sub $t4, $t4, 1
+    add $s3, $s3, $t4
+    move $t4, $zero 
+    move $t5, $zero
+    j convertBack
 
 greaterThan255:
     li $t6, 255
     add $t2, $t2, $t6
+    add $s0, $t4, $zero
+    sub $t4, $t4, 1
+    add $s3, $s3, $t4
+    move $t4, $zero 
+    move $t5, $zero
     j convertBack
 
 print:
@@ -138,7 +158,7 @@ close_file:
     move $a0, $v0
     li $v0, 15
     la $a1, outputStr #write output string to file
-    li $a2, 70
+    li $a2, 47803
     syscall
 
     li $v0, 16    # close the file
