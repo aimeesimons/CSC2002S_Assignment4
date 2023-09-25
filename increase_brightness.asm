@@ -1,13 +1,13 @@
 .data
-buffer:         .space  47803   # Buffer to store the file 
-filename:       .asciiz "C:/Users/Aimee Simons/Desktop/2023/Lectures/Semester 2/CSC2002S/Assignments/Assignment4/CSC2002S_Assignment4/sample_images/house_64_in_ascii_lf.ppm"
+buffer:         .space  49000   # Buffer to store the file 
+filename:       .asciiz "C:/Users/Aimee Simons/Desktop/2023/Lectures/Semester 2/CSC2002S/Assignments/Assignment4/CSC2002S_Assignment4/sample_images/jet_64_in_ascii_lf.ppm"
 newNumber:      .space 10
 IntNum:         .space 10
 message1:       .asciiz "Average pixel value of the original image:\n"
 message2:       .asciiz "Average pixel value of the new image:\n"
-outputStr:      .space 47803 # buffer to store the output
-outputFile:     .asciiz "C:/Users/Aimee Simons/Desktop/2023/Lectures/Semester 2/CSC2002S/Assignments/Assignment4/CSC2002S_Assignment4/output files/increase_brightness_House.ppm"
-colourHeader:   .asciiz "P3\n# Hse\n64 64\n255\n"
+outputStr:      .space 49000 # buffer to store the output
+outputFile:     .asciiz "C:/Users/Aimee Simons/Desktop/2023/Lectures/Semester 2/CSC2002S/Assignments/Assignment4/CSC2002S_Assignment4/output files/increase_brightness_Jet.ppm"
+colourHeader:   .asciiz "P3\n# Jet\n64 64\n255\n"
 average1:       .asciiz "%.2f\n"
 average2:       .asciiz "%.2f\n"
 denominator:    .double 12288.0
@@ -19,6 +19,7 @@ newline:        .asciiz "\n"
 main:
     la $s2, newNumber
     la $s3, outputStr
+    la $s7, outputStr
     la $s4, colourHeader
     move $t1, $zero
     loop1:
@@ -51,7 +52,7 @@ main:
     
     li $v0, 14
     la $a1, buffer
-    la $a2, 47803
+    la $a2, 49000
     syscall
 
     lb $t3, 0($a1)
@@ -148,17 +149,19 @@ close_file:
     li      $v0, 16             # Syscall code for close (16)
     move    $a0, $v0           # File descriptor (returned by open) in $a0
     syscall
-
+            
     li $v0, 13           # open output file
     la $a0, outputFile
     li $a1, 1
     li $a2, 0
     syscall
+    
+    sub $s7, $s3, $s7 #calculate offset
 
     move $a0, $v0
     li $v0, 15
     la $a1, outputStr #write output string to file
-    li $a2, 47803
+    move $a2, $s7 # number of bytes to write
     syscall
 
     li $v0, 16    # close the file

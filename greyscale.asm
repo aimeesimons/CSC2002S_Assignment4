@@ -1,9 +1,9 @@
 .data
-buffer:         .space  47803   # Buffer to store  
+buffer:         .space  49000   # Buffer to store  
 filename:       .asciiz "C:/Users/Aimee Simons/Desktop/2023/Lectures/Semester 2/CSC2002S/Assignments/Assignment4/CSC2002S_Assignment4/sample_images/house_64_in_ascii_lf.ppm"
 newNumber:      .space 10
 IntNum:         .space 10
-outputStr:      .space 16014
+outputStr:      .space 49000
 outputFile:     .asciiz "C:/Users/Aimee Simons/Desktop/2023/Lectures/Semester 2/CSC2002S/Assignments/Assignment4/CSC2002S_Assignment4/output files/greyscale_House.ppm"
 greyHeader:   .asciiz "P2\n# Hse\n64 64\n255\n"
 newline:        .asciiz "\n"
@@ -13,6 +13,7 @@ newline:        .asciiz "\n"
 main:
     la $s2, newNumber
     la $s3, outputStr
+    la $s1, outputStr
     la $s4, greyHeader
     move $t1, $zero
     loop1:
@@ -57,7 +58,7 @@ main:
         lb $t3, 0($t0)
         ble $t3, 0, close_file    # if reached the end of the file
         beq $t3, 10, convert   # if an endline character is found
-        beq $t3, 13, close_file
+        beq $t3, 13, close_file # if reached the end of the file
         sb $t3, 0($s2)   
         addi $t0, $t0, 1
         addi $s2, $s2, 1
@@ -117,8 +118,8 @@ avg:
     li $t2, 0
     j grey
 
-zero:
-    beq $t1, 0, print
+zero: # if the remainder is zero
+    beq $t1, 0, print # if the quotient is also zero
     add $t7, $t7, '0'
     sb $t7, 0($s3)
     addi $s3, $s3, -1
@@ -148,10 +149,12 @@ close_file:
     li $a2, 0
     syscall
 
+    sub $s1, $s3, $s1 # calculate offset
+
     move $a0, $v0
     li $v0, 15
     la $a1, outputStr #write output string to file
-    li $a2, 16014
+    move $a2, $s1   # number of bytes to write
     syscall
 
     li $v0, 16    # close the file
