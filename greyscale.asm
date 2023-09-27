@@ -1,9 +1,8 @@
 .data
-buffer:         .space  49000   # Buffer to store  
+buffer:         .space  60000   # Buffer to store  
 filename:       .asciiz "C:/Users/Aimee Simons/Desktop/2023/Lectures/Semester 2/CSC2002S/Assignments/Assignment4/CSC2002S_Assignment4/sample_images/house_64_in_ascii_lf.ppm"
 newNumber:      .space 10
-IntNum:         .space 10
-outputStr:      .space 49000
+outputStr:      .space 60000
 outputFile:     .asciiz "C:/Users/Aimee Simons/Desktop/2023/Lectures/Semester 2/CSC2002S/Assignments/Assignment4/CSC2002S_Assignment4/output files/greyscale_House.ppm"
 greyHeader:   .asciiz "P2\n# Hse\n64 64\n255\n"
 newline:        .asciiz "\n"
@@ -46,7 +45,7 @@ main:
 
     li $v0, 14
     la $a1, buffer
-    la $a2, 47803
+    la $a2, 60000
     syscall
 
     lb $t3, 0($a1)

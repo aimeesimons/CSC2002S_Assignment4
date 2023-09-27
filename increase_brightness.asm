@@ -1,11 +1,10 @@
 .data
-buffer:         .space  49000   # Buffer to store the file 
+buffer:         .space  60000  # Buffer to store the file 
 filename:       .asciiz "C:/Users/Aimee Simons/Desktop/2023/Lectures/Semester 2/CSC2002S/Assignments/Assignment4/CSC2002S_Assignment4/sample_images/jet_64_in_ascii_lf.ppm"
 newNumber:      .space 10
-IntNum:         .space 10
 message1:       .asciiz "Average pixel value of the original image:\n"
 message2:       .asciiz "Average pixel value of the new image:\n"
-outputStr:      .space 49000 # buffer to store the output
+outputStr:      .space 60000 # buffer to store the output
 outputFile:     .asciiz "C:/Users/Aimee Simons/Desktop/2023/Lectures/Semester 2/CSC2002S/Assignments/Assignment4/CSC2002S_Assignment4/output files/increase_brightness_Jet.ppm"
 colourHeader:   .asciiz "P3\n# Jet\n64 64\n255\n"
 average1:       .asciiz "%.2f\n"
@@ -52,7 +51,7 @@ main:
     
     li $v0, 14
     la $a1, buffer
-    la $a2, 49000
+    la $a2, 60000
     syscall
 
     lb $t3, 0($a1)
