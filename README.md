@@ -56,3 +56,4 @@ NB! Please use an lf file when inputing an image (not cr or crlf file).
 8. Done! You may run using QTSpim.
 NB! Please use an lf file when inputing an image (not cr or crlf file).
 
+"Also, when running the programs, depending on the type of computer you have, the programs might take more than a few seconds to run." 
