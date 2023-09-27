@@ -13,7 +13,7 @@
   - tree_64_in_ascii_cr.ppm
   - tree_64_in_ascii_crlf.ppm
   - tree_64_in_ascii_lf.ppm *
-* /output files (output image files after processing)
+* /output files (output image files after processing- These are already created)
   - greyscale_House.ppm
   - greyscale_Jet.ppm
   - greyscale_Tree.ppm
