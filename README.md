@@ -37,7 +37,7 @@
      - "jet" -> # Jet
      - "tree: -> # Tre
 9. Done! You may run using QTSpim.
-NB! Please use an lf file when inputing an image (not cr or crlf file).
+NB! Please use an lf file when inputing an image (not cr or crlf file). What happens is, QTSpim should use lf as an endline character, but it sometimes switches between 13 and 10 for the use of an endline character for some reason, so it might stop the program prematurely if a cr or crlf file is used.
 
 ### greyscale.asm:
 ![image](https://github.com/aimeesimons/CSC2002S_Assignment4/assets/126353532/bcee96e2-cb8e-4a9b-b657-b9576546a8e5)
@@ -54,6 +54,6 @@ NB! Please use an lf file when inputing an image (not cr or crlf file).
      - "jet" -> # Jet
      - "tree: -> # Tre
 8. Done! You may run using QTSpim.
-NB! Please use an lf file when inputing an image (not cr or crlf file).
+NB! Please use an lf file when inputing an image (not cr or crlf file). What happens is, QTSpim should use lf as an endline character, but it sometimes switches between 13 and 10 for the use of an endline character for some reason, so it might stop the program prematurely if a cr or crlf file is used.
 
 "Also, when running the programs, depending on the type of computer you have, the programs might take more than a few seconds to run." 

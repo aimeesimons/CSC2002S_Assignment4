@@ -1,45 +1,45 @@
 .data
 buffer:         .space  60000  # Buffer to store the file 
-filename:       .asciiz "C:/Users/Aimee Simons/Desktop/2023/Lectures/Semester 2/CSC2002S/Assignments/Assignment4/CSC2002S_Assignment4/sample_images/jet_64_in_ascii_lf.ppm"
+filename:       .asciiz "C:/Users/Aimee Simons/Desktop/2023/Lectures/Semester 2/CSC2002S/Assignments/Assignment4/CSC2002S_Assignment4/sample_images/jet_64_in_ascii_crlf.ppm"
 newNumber:      .space 10
 message1:       .asciiz "Average pixel value of the original image:\n"
 message2:       .asciiz "Average pixel value of the new image:\n"
 outputStr:      .space 60000 # buffer to store the output
 outputFile:     .asciiz "C:/Users/Aimee Simons/Desktop/2023/Lectures/Semester 2/CSC2002S/Assignments/Assignment4/CSC2002S_Assignment4/output files/increase_brightness_Jet.ppm"
-colourHeader:   .asciiz "P3\n# Jet\n64 64\n255\n"
-average1:       .asciiz "%.2f\n"
-average2:       .asciiz "%.2f\n"
-denominator:    .double 12288.0
-maximum:        .double 255.0
+colourHeader:   .asciiz "P3\n# Jet\n64 64\n255\n" # header for the output file
+average1:       .asciiz "%.2f\n" # format of the averages
+average2:       .asciiz "%.2f\n" # format of the averages
+denominator:    .double 12288.0 # Max number of RGB values
+maximum:        .double 255.0 # maximum RGB value
 newline:        .asciiz "\n"
 .text
 .globl main
 
 main:
-    la $s2, newNumber
-    la $s3, outputStr
-    la $s7, outputStr
-    la $s4, colourHeader
+    la $s2, newNumber # load the address of the number
+    la $s3, outputStr #load the address of the output string; this will be modified.
+    la $s7, outputStr #load the address of the output string; this will not be modified.
+    la $s4, colourHeader 
     move $t1, $zero
     loop1:
-        lb $t0, 0($s4)
+        lb $t0, 0($s4)                 # '
         sb $t0, 0($s3)
         beq $t0, 10, increment
-        beq $t1, 4, openFile
+        beq $t1, 4, openFile                
         addi $s3, $s3, 1
-        addi $s4, $s4, 1
+        addi $s4, $s4, 1                  # Copying the header to the output string
         j loop1
     increment:
         addi $t1, $t1, 1
         addi $s3, $s3, 1
         addi $s4, $s4, 1
-        j loop1
+        j loop1                          #'
 
     openFile:
         # Open the file for reading
         li      $v0, 13             # Syscall code for open (13)
         la      $a0, filename       # Load the address of the filename
-        li      $a1, 0              
+        li      $a1, 0              # opening to read
         li      $a2, 0
         syscall
     # Check if the file opened successfully
@@ -50,8 +50,8 @@ main:
     li $t2, 0 # Sum variable for average 2
     
     li $v0, 14
-    la $a1, buffer
-    la $a2, 60000
+    la $a1, buffer # load the file buffer to read the contents
+    la $a2, 60000 
     syscall
 
     lb $t3, 0($a1)
@@ -63,7 +63,7 @@ main:
         lb $t3, 0($t0)
         ble $t3, 0, close_file    # if reached the end of the file
         beq $t3, 10, convert   # if an endline character is found
-        beq $t3, 13, close_file
+        beq $t3, 13, close_file # if reached the end of the file, in case crlf file is used, this is unused if not
         sb $t3, 0($s2)   
         addi $t0, $t0, 1
         addi $s2, $s2, 1
@@ -73,7 +73,7 @@ main:
         
 
 
-convert:
+convert:    #converting to an integer
     li $t6, 0
     sub $s2, $s2, $t4
     move $t8, $zero
@@ -97,20 +97,20 @@ convert:
         bgt $t6, 100, cont
         blt $t6, 100, cont2
         cont:
-            blt $t6, 110, lessThan110
+            blt $t6, 110, lessThan110  # if (x>100 and x<110) this is because the number had changed from a 2 digit number to a 3 digit number
             cont2:
                 add $s0, $t4, $zero
                 sub $t4, $t4, 1
-                add $s3, $s3, $t4
+                add $s3, $s3, $t4 # offset the output string to accomondate for the length of the number.e.g. 1 for 2 digits and 2 for 3 digits.
                 move $t4, $zero 
                 move $t5, $zero
                 convertBack:        # convert back to string to print to textfile 
                     div $t6, $t6, 10
-                    mfhi $t7
+                    mfhi $t7   # x mod 10
                     beq $t5, $s0, print # add endline character to string
                     add $t7, $t7, '0'
                     sb $t7, 0($s3)
-                    addi $s3, $s3, -1
+                    addi $s3, $s3, -1 #copying the string "in reverse"
                     addi $t5, $t5, 1  # counter for loop
                     j convertBack
            
@@ -145,8 +145,8 @@ print:
 
 close_file:
     # Close the file
-    li      $v0, 16             # Syscall code for close (16)
-    move    $a0, $v0           # File descriptor (returned by open) in $a0
+    li      $v0, 16             # Syscall code for close 
+    move    $a0, $v0           # File descriptor in $a0
     syscall
             
     li $v0, 13           # open output file
@@ -186,7 +186,7 @@ close_file:
     syscall
 
 
-    mov.d     $f12, $f0
+    mov.d     $f12, $f0 # move to the output floating point register
     la $a0, average1
     li $v0, 3
     syscall
@@ -199,7 +199,7 @@ close_file:
     la $a0, message2
     syscall
 
-    mov.d     $f12, $f2
+    mov.d     $f12, $f2 # move to the output floating point register
     la $a0, average2
     li $v0, 3
     syscall
